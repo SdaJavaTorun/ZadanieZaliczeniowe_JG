@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -11,15 +12,12 @@ public class Company extends Employee {
 
     private List<Employee> list = new ArrayList<Employee>();
 
-    public void longestLastName() throws IOException, ClassNotFoundException {
-        String fileName = "C://Users//RENT//Desktop//output.txt";
+    public void exportToHTML(String file) throws IOException, ClassNotFoundException{
+        String fileName = file;
         FileInputStream fileInput= new FileInputStream(fileName);
         InputStream bufferIn = new BufferedInputStream(fileInput);
         ObjectInputStream objectInput = new ObjectInputStream(bufferIn);
-
         Employee a =null;
-        Employee longestLastName = new Employee();
-        longestLastName.setLastName("");
         List<Employee> list2 = new ArrayList<Employee>();
 
         while (true) {
@@ -31,13 +29,148 @@ public class Company extends Employee {
                 break;
             }
         }
-       // Comparator<Employee> byLastName = (e1, e2) -> Float.compare(e1.getSalary(), e2.getSalary());
-       // list2 = list.stream().sorted(bySalary).collect(Collectors.toList());;
+        objectInput.close();
+        File outputhtml = new File( "C://Users//RENT//Desktop//output.html" );
+        PrintWriter pw = new PrintWriter(outputhtml);
+
+        pw.println("<!DOCTYPE html>");
+        pw.println("<html>");
+        pw.println("    <head>");
+        pw.println("        <meta charset="+"utf-8"+">");
+        pw.println("        <title>Company</title> ");
+        pw.println("    </head>");
+        pw.println("<body>");
+        pw.println("<table>");
+        pw.println("<thead>");
+        pw.println("    <tr>");
+        pw.println("        <th>Nazwisko</th>");
+        pw.println("        <th>Imie</th>");
+        pw.println("        <th>Plec</th>");
+        pw.println("        <th>Numer Dzialu</th>");
+        pw.println("        <th>Placa</th>");
+        pw.println("        <th>Wiek</th>");
+        pw.println("    </tr>");
+        pw.println("</thead>");
+        pw.println("<tbody>");
+
+        for(Employee p : list2){
+
+            pw.println("<tr>");
+
+            pw.println("        <td>" + p.getLastName() + "</td>");
+            pw.println("        <td>" + p.getName() + "</td>");
+            pw.println("        <td>" + p.getGender() + "</td>");
+            pw.println("        <td>" + p.getDepNumber() + "</td>");
+            pw.println("        <td>" + p.getSalary() + "</td>");
+            pw.println("        <td>" + p.getAge() + "</td>");
+
+            pw.println("</tr>");
+        }
+
+        pw.println("</tbody>");
+        pw.println("</table>");
+
+        pw.close();
+    }
+
+    public void lastNameCoding(String file) throws ClassNotFoundException, IOException{
+        String fileName = file;
+        FileInputStream fileInput= new FileInputStream(fileName);
+        InputStream bufferIn = new BufferedInputStream(fileInput);
+        ObjectInputStream objectInput = new ObjectInputStream(bufferIn);
+        Employee a =null; int n = 0; int suma = 0;
+        List<Employee> list2 = new ArrayList<Employee>();
+
+        while (true) {
+            try {
+                a = (Employee)objectInput.readObject();
+                list2.add(a);
+            }
+            catch (EOFException exc) {
+                break;
+            }
+        }
+
+        for (Employee p : list2) {
+            n++;
+            suma += p.getSalary();
+        }
+
+        OutputStream fileOutput = new FileOutputStream(fileName);
+        OutputStream bufferOut  = new BufferedOutputStream(fileOutput);
+        ObjectOutput objectOutput = new ObjectOutputStream(bufferOut);
+
+        for (Employee p : list2) {
+            if (p.getSalary() > (float)(suma/n)){
+                String nazwisko = "" + p.getLastName().charAt(0);
+                for (int i = 1; i < p.getLastName().length() - 1; i++){
+                    nazwisko += "*";
+                }
+                nazwisko += p.getLastName().charAt(p.getLastName().length()-1);
+                p.setLastName(nazwisko);
+            }
+            objectOutput.writeObject(p);
+        }
+
+        objectOutput.close();
+    }
+
+    public void avegareAgeWhenHavingChild(String file) throws IOException, ClassNotFoundException{
+        String fileName = file;
+        FileInputStream fileInput= new FileInputStream(fileName);
+        InputStream bufferIn = new BufferedInputStream(fileInput);
+        ObjectInputStream objectInput = new ObjectInputStream(bufferIn);
+        Employee a =null; int n = 0; int suma = 0;
+        List<Employee> list2 = new ArrayList<Employee>();
+
+        while (true) {
+            try {
+                a = (Employee)objectInput.readObject();
+                list2.add(a);
+            }
+            catch (EOFException exc) {
+                break;
+            }
+        }
+
+        for (Employee p : list2) {
+            if(p.getChildNumber() > 0){
+                n++;
+                suma += p.getAge();
+            }
+        }
+        System.out.println("Średnia wieku osób posiadających dzieci to " + (suma/n) + " lat");
+    }
+
+    public void longestLastName(String file) throws IOException, ClassNotFoundException {
+        String fileName = file;
+        FileInputStream fileInput= new FileInputStream(fileName);
+        InputStream bufferIn = new BufferedInputStream(fileInput);
+        ObjectInputStream objectInput = new ObjectInputStream(bufferIn);
+
+        Employee a =null;
+        Employee longestLastName = new Employee();
+        longestLastName.setLastName("a");
+        List<Employee> list2 = new ArrayList<Employee>();
+
+        while (true) {
+            try {
+                a = (Employee)objectInput.readObject();
+                list2.add(a);
+            }
+            catch (EOFException exc) {
+                break;
+            }
+        }
+
+        Comparator<Employee> byLastNameLength = (e1, e2) -> Integer.compare(e1.getLastName().length(), e2.getLastName().length());
+        System.out.println(list2.stream().max(byLastNameLength).get());
 
     }
 
-    public void objectExport() throws IOException {
-        String fileName = "C://Users//RENT//Desktop//output.txt";
+
+    public void objectExport(String file) throws IOException {
+        String fileName = file;
 
         OutputStream fileOutput = new FileOutputStream(fileName);
         OutputStream bufferOut  = new BufferedOutputStream(fileOutput);
@@ -49,18 +182,18 @@ public class Company extends Employee {
         objectOutput.close();
     }
 
-    public void salarySort(boolean order) throws FileNotFoundException {
+    public void salarySort(int order) throws FileNotFoundException {
         List<Employee> list2 = new ArrayList<Employee>();
-        if (order == true) {
+        if (order == 0) {
             Comparator<Employee> bySalary = (e1, e2) -> Float.compare(e1.getSalary(), e2.getSalary());
             list2 = list.stream().sorted(bySalary).collect(Collectors.toList());;
         }
-        else if (order == false){
+        else if (order == 1){
             Comparator<Employee> bySalary = (e1, e2) -> Float.compare(e2.getSalary(), e1.getSalary());
             list2 = list.stream().sorted(bySalary).collect(Collectors.toList());;
         }
 
-        File output = new File( "C://Users//RENT//Desktop//output2.txt" );
+        File output = new File( "C://Users//RENT//Desktop//output.txt" );
         PrintWriter pw = new PrintWriter(output);
         for(Employee p : list2){
             pw.println (p);
@@ -68,17 +201,17 @@ public class Company extends Employee {
         pw.close();
     }
 
-    public void lastNameSort(boolean order) throws FileNotFoundException {
+    public void lastNameSort(int order) throws FileNotFoundException {
         List<Employee> list2 = new ArrayList<Employee>();
-        if (order == true) {
+        if (order == 0) {
             Comparator<Employee> byLastName = (e1, e2) -> e1.getLastName().compareTo(e2.getLastName());
             list2 = list.stream().sorted(byLastName).collect(Collectors.toList());
         }
-        else if (order ==false){
+        else if (order == 1){
             Comparator<Employee> byLastName = (e1, e2) -> e2.getLastName().compareTo(e1.getLastName());
             list2 = list.stream().sorted(byLastName).collect(Collectors.toList());
-            }
-        File output = new File( "C://Users//RENT//Desktop//output2.txt" );
+        }
+        File output = new File( "C://Users//RENT//Desktop//output.txt" );
         PrintWriter pw = new PrintWriter(output);
         for(Employee p : list2){
             pw.println (p);
@@ -184,6 +317,7 @@ public class Company extends Employee {
     }
 
     public void salaryAverage(int dep){
+
         double srednia; double suma = 0; int n = 0;
         for (Employee p : list){
             if (p.getDepNumber() == dep){
@@ -195,7 +329,10 @@ public class Company extends Employee {
         System.out.println("Srednia pensja w dziale " + dep + " = " + srednia);
     }
 
-    public void salarySort(float threshold){
+    public void salarySort(){
+        System.out.println("Podaj próg pensji");
+        Scanner sc = new Scanner(System.in);
+        float threshold = sc.nextFloat();
         int a = 0;
         for (Employee p : list){
             if (p.getSalary() >= threshold )
@@ -207,20 +344,21 @@ public class Company extends Employee {
     public void editEmployee(){
         showList();
         Scanner sc = new Scanner(System.in);
+        Scanner sc1 = new Scanner(System.in);
         System.out.println("Wybierz numer pracownika do edycji");
         int a = sc.nextInt();
         list.get(a).showSpecial();
         if (list.get(a).getGender() == 'F'){
             System.out.println("Wybierz co chcesz edytować");
             System.out.println("1 - Last Name");
-            System.out.println("2 - Married ('Yes' or 'No')"); //tu cos nie halo
+            System.out.println("2 - Married ('Yes' or 'No')");
             System.out.println("3 - Dep Number");
             System.out.println("4 - Salary");
             System.out.println("5 - Age");
             System.out.println("6 - Number of Children");;
             switch (sc.nextInt()){
-                case 1 : list.get(a).setLastName(sc.nextLine()); break;
-                case 2 : if (sc.nextLine().charAt(0) == 'Y')
+                case 1 : list.get(a).setLastName(sc1.nextLine()); break;
+                case 2 : if (sc1.nextLine().charAt(0) == 'Y')
                 {list.get(a).setMarital(true); }
                 else
                 {list.get(a).setMarital(false);}
@@ -233,13 +371,13 @@ public class Company extends Employee {
         }
         else if (list.get(a).getGender() == 'M'){
             System.out.println("Wybierz co chcesz edytować");
-            System.out.println("1 - Married ('Yes' or 'No')"); //tu cos nie halo
+            System.out.println("1 - Married ('Yes' or 'No')");
             System.out.println("2 - Dep Number");
             System.out.println("3 - Salary");
             System.out.println("4 - Age");
-            System.out.println("5 - Number of Children");;
+            System.out.println("5 - Number of Children");
             switch (sc.nextInt()){
-                case 1 : if (sc.nextLine().charAt(0) == 'Y')
+                case 1 : if (sc1.nextLine().charAt(0) == 'Y')
                 {list.get(a).setMarital(true); }
                 else
                 {list.get(a).setMarital(false);}
@@ -250,6 +388,7 @@ public class Company extends Employee {
                 case 5 : list.get(a).setChildNumber(sc.nextInt()); break;
             }
         }
+        System.out.println("Dane zostały zmienione");
     }
 
     public void removeEmployee(){
@@ -257,21 +396,27 @@ public class Company extends Employee {
         Scanner sc = new Scanner(System.in);
         System.out.println("Wybierz numer pracownika do usunięcia");
         list.remove(sc.nextInt());
+        System.out.println("Pracownik został usunięty");
     }
 
     public void export() throws FileNotFoundException{
-        File output = new File( "C://Users//j.gutkowski//Desktop//output.txt" ); //reczne podawanie pliku
+        System.out.println("Plik zostanie zapisany na Pulpicie");
+        System.out.println("Podaj nazwę pliku docelowego bez rozszerzenia");
+        Scanner sc = new Scanner(System.in);
+        File output = new File( "C://Users//RENT//Desktop//" + sc.nextLine()+ ".txt" );
         PrintWriter pw = new PrintWriter(output);
         for(Employee p : list){
             pw.println (p.getLastName() + " " + p.getName() + " " + p.getGender() + " " +
                     p.getDepNumber() + " " + p.getSalary() + " " + p.getAge() + " " + p.getChildNumber());
         }
         pw.close();
+
     }
 
     public void addEmployee(){
         Employee worker = new Employee();
         Scanner sc = new Scanner(System.in);
+        System.out.println("Podaj dane pracownika");
         System.out.println("Set Name");
         worker.setName(sc.nextLine());
         System.out.println("Set Last Name");
@@ -283,7 +428,7 @@ public class Company extends Employee {
             setMarital(true);
         else
             setMarital(false);
-        System.out.println("Set Dep Number");
+        System.out.println("Set Dep Number [1 or 2 or 3]");
         worker.setDepNumber(sc.nextInt());
         System.out.println("Set Salary");
         worker.setSalary(sc.nextFloat());
@@ -293,6 +438,7 @@ public class Company extends Employee {
         worker.setChildNumber(sc.nextInt());
 
         this.list.add(worker);
+        System.out.println("Pracownik został dodany");
     }
 
     public void showList(){
@@ -312,3 +458,4 @@ public class Company extends Employee {
 
 
 }
+

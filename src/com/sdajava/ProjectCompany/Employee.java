@@ -55,7 +55,17 @@ public class Employee implements Serializable {
     }
 
     public void setName(String name) {
-        this.name = name;
+        String name3 = "";
+        String nameFinalne ="";
+        String name2 = "" + name.charAt(0);
+        nameFinalne = name2.toUpperCase();
+        char[] tab = name.toCharArray();
+        for (int i = 1; i < name.length(); i++){
+            name3 += tab[i];
+        }
+        nameFinalne += name3.toLowerCase();
+
+        this.name = nameFinalne;
     }
 
     public String getLastName() {
@@ -63,7 +73,17 @@ public class Employee implements Serializable {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        String lastName3 = "";
+        String lastNameFinalne ="";
+        String lastName2 = "" + lastName.charAt(0);
+        lastNameFinalne = lastName2.toUpperCase();
+        char[] tab = lastName.toCharArray();
+        for (int i = 1; i < lastName.length(); i++){
+            lastName3 += tab[i];
+        }
+        lastNameFinalne += lastName3.toLowerCase();
+
+        this.lastName = lastNameFinalne;
     }
 
     public char getGender() {
@@ -113,7 +133,5 @@ public class Employee implements Serializable {
     public void setMarital(boolean marital) {
         this.marital = marital;
     }
-
-
 
 }
